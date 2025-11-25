@@ -18,6 +18,119 @@
             padding: 20px;
         }
 
+        /* ログイン画面スタイル */
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .login-body {
+            padding: 40px 30px;
+        }
+
+        .login-input-group {
+            margin-bottom: 25px;
+        }
+
+        .login-input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .login-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .login-footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* メインアプリのスタイル */
+        .app-container {
+            display: none;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -32,6 +145,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
@@ -43,6 +157,24 @@
         .header p {
             font-size: 14px;
             opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         .main-content {
@@ -272,100 +404,180 @@
             .header h1 {
                 font-size: 22px;
             }
+
+            .logout-btn {
+                position: static;
+                display: block;
+                margin: 15px auto 0;
+                width: 150px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <!-- ログイン画面 -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-header">
             <h1>🏗️ 建築法規調査システム</h1>
-            <p>地図で地点を選択 → 自治体GISサイトで情報取得 → テキスト整形</p>
+            <p>会員専用ページ</p>
         </div>
+        <div class="login-body">
+            <div class="error-message" id="errorMessage">
+                パスワードが正しくありません
+            </div>
+            <form id="loginForm" onsubmit="checkPassword(event)">
+                <div class="login-input-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" placeholder="パスワードを入力してください" required autofocus>
+                </div>
+                <button type="submit" class="login-btn">ログイン</button>
+            </form>
+        </div>
+        <div class="login-footer">
+            このシステムは会員専用です<br>
+            パスワードをお持ちでない方は管理者にお問い合わせください
+        </div>
+    </div>
 
-        <div class="main-content">
-            <!-- ステップ1: 住所検索 -->
-            <div class="section">
-                <div class="section-title">
-                    <span class="step-badge">1</span>
-                    住所検索・地図表示
-                </div>
-                
-                <div class="input-group">
-                    <label>📍 調査対象の住所を入力</label>
-                    <input type="text" id="addressInput" placeholder="例: 東京都千代田区丸の内1-1-1">
-                </div>
-                
-                <button class="btn btn-primary" onclick="searchAddress()">
-                    🔍 住所検索
-                </button>
-
-                <div class="alert-info" style="margin-top: 15px;">
-                    💡 地図が表示されたら、調査したい地点をクリックしてください
-                </div>
+    <!-- メインアプリ -->
+    <div class="app-container" id="appContainer">
+        <div class="container">
+            <div class="header">
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+                <h1>🏗️ 建築法規調査システム</h1>
+                <p>地図で地点を選択 → 自治体GISサイトで情報取得 → テキスト整形</p>
             </div>
 
-            <!-- ステップ2: 地図 -->
-            <div class="section">
-                <div class="section-title">
-                    <span class="step-badge">2</span>
-                    地図上で地点を選択
-                </div>
-                <div id="map"></div>
-            </div>
+            <div class="main-content">
+                <!-- ステップ1: 住所検索 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="step-badge">1</span>
+                        住所検索・地図表示
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>📍 調査対象の住所を入力</label>
+                        <input type="text" id="addressInput" placeholder="例: 東京都千代田区丸の内1-1-1">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="searchAddress()">
+                        🔍 住所検索
+                    </button>
 
-            <!-- ステップ3: 座標情報とGISリンク -->
-            <div id="coordinateInfo" class="coordinate-display" style="display: none;">
-                <strong>📌 選択地点の情報:</strong><br>
-                緯度: <span id="latDisplay">-</span><br>
-                経度: <span id="lngDisplay">-</span><br>
-                自治体: <span id="municipalityDisplay" style="font-size: 18px; font-weight: bold; color: #d9534f;">-</span>
-            </div>
-
-            <div id="gisLinkSection" class="gis-link-section" style="display: none;">
-                <h3>🗺️ 自治体の都市計画情報サイト</h3>
-                <div class="gis-info">
-                    <strong id="gisCity">-</strong> の都市計画情報を確認できます
-                </div>
-                <button class="btn btn-success" onclick="openGISLink()">
-                    📂 <span id="gisCityName">自治体</span>GISサイトを開く
-                </button>
-                <div class="alert-info" style="margin-top: 15px;">
-                    ✨ GISサイトで用途地域・容積率などを確認し、情報をコピーして下の欄に貼り付けてください
-                </div>
-            </div>
-
-            <!-- ステップ4: GIS情報整形 -->
-            <div class="section">
-                <div class="section-title">
-                    <span class="step-badge">3</span>
-                    GIS情報の整形
-                </div>
-                
-                <div class="input-group">
-                    <label>📋 GISサイトからコピーした情報を貼り付け</label>
-                    <textarea id="gisRawInput" placeholder="例:&#10;【A】用途地域等&#10;都市計画区域	都市計画区域内&#10;区域区分	市街化区域&#10;用途地域	商業地域&#10;容積率	700 %&#10;..."></textarea>
-                </div>
-                
-                <button class="btn btn-info" onclick="formatGISInfo()">
-                    ✨ テキストを整形する
-                </button>
-                <button class="btn btn-primary" onclick="copyFormatted()">
-                    📄 整形結果をコピー
-                </button>
-
-                <div class="alert-info">
-                    💡 コピーした情報を「項目名：値」形式に自動整形します
+                    <div class="alert-info" style="margin-top: 15px;">
+                        💡 地図が表示されたら、調査したい地点をクリックしてください
+                    </div>
                 </div>
 
-                <div id="formattedOutput" class="formatted-output" style="display: none;"></div>
-                <div id="copySuccess" class="alert-success" style="display: none;">
-                    ✅ コピーしました！
+                <!-- ステップ2: 地図 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="step-badge">2</span>
+                        地図上で地点を選択
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <!-- ステップ3: 座標情報とGISリンク -->
+                <div id="coordinateInfo" class="coordinate-display" style="display: none;">
+                    <strong>📌 選択地点の情報:</strong><br>
+                    緯度: <span id="latDisplay">-</span><br>
+                    経度: <span id="lngDisplay">-</span><br>
+                    自治体: <span id="municipalityDisplay" style="font-size: 18px; font-weight: bold; color: #d9534f;">-</span>
+                </div>
+
+                <div id="gisLinkSection" class="gis-link-section" style="display: none;">
+                    <h3>🗺️ 自治体の都市計画情報サイト</h3>
+                    <div class="gis-info">
+                        <strong id="gisCity">-</strong> の都市計画情報を確認できます
+                    </div>
+                    <button class="btn btn-success" onclick="openGISLink()">
+                        📂 <span id="gisCityName">自治体</span>GISサイトを開く
+                    </button>
+                    <div class="alert-info" style="margin-top: 15px;">
+                        ✨ GISサイトで用途地域・容積率などを確認し、情報をコピーして下の欄に貼り付けてください
+                    </div>
+                </div>
+
+                <!-- ステップ4: GIS情報整形 -->
+                <div class="section">
+                    <div class="section-title">
+                        <span class="step-badge">3</span>
+                        GIS情報の整形
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>📋 GISサイトからコピーした情報を貼り付け</label>
+                        <textarea id="gisRawInput" placeholder="例:&#10;【A】用途地域等&#10;都市計画区域	都市計画区域内&#10;区域区分	市街化区域&#10;用途地域	商業地域&#10;容積率	700 %&#10;..."></textarea>
+                    </div>
+                    
+                    <button class="btn btn-info" onclick="formatGISInfo()">
+                        ✨ テキストを整形する
+                    </button>
+                    <button class="btn btn-primary" onclick="copyFormatted()">
+                        📄 整形結果をコピー
+                    </button>
+
+                    <div class="alert-info">
+                        💡 コピーした情報を「項目名：値」形式に自動整形します
+                    </div>
+
+                    <div id="formattedOutput" class="formatted-output" style="display: none;"></div>
+                    <div id="copySuccess" class="alert-success" style="display: none;">
+                        ✅ コピーしました！
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ==================== 認証システム ====================
+        // パスワード設定（ここを変更してパスワードを設定）
+        const VALID_PASSWORD = 'building2024';  // ← ここでパスワードを変更できます
+        const AUTH_KEY = 'building_app_auth';
+
+        // ページ読み込み時に認証チェック
+        window.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem(AUTH_KEY) === 'true') {
+                showApp();
+            }
+        });
+
+        // パスワードチェック
+        function checkPassword(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            
+            if (password === VALID_PASSWORD) {
+                localStorage.setItem(AUTH_KEY, 'true');
+                showApp();
+            } else {
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.style.display = 'block';
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                }, 3000);
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // アプリ表示
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+        }
+
+        // ログアウト
+        function logout() {
+            if (confirm('ログアウトしますか？')) {
+                localStorage.removeItem(AUTH_KEY);
+                location.reload();
+            }
+        }
+
+        // ==================== メインアプリ ====================
         let map;
         let marker;
         let currentLat = null;
@@ -673,7 +885,6 @@
                 return;
             }
 
-            // テキストを行単位で処理
             const lines = rawText.split('\n');
             let formatted = [];
             let currentKey = null;
@@ -682,7 +893,6 @@
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim();
                 
-                // 空行はスキップ（セクション間の区切りとして1つ追加）
                 if (!line) {
                     if (formatted.length > 0 && formatted[formatted.length - 1] !== '') {
                         formatted.push('');
@@ -692,7 +902,6 @@
                     continue;
                 }
 
-                // セクションヘッダー（【A】など）を検出
                 if (line.match(/^【[A-Z]】/)) {
                     if (formatted.length > 0) formatted.push('');
                     formatted.push(line);
@@ -701,10 +910,8 @@
                     continue;
                 }
 
-                // 「※」「説明」「URL」で始まる特殊行はそのまま
                 if (line.startsWith('※') || line.startsWith('説明') || line.startsWith('URL')) {
                     if (line.includes('\t') || line.match(/^(説明|URL)\s/)) {
-                        // タブやスペースがある場合は分割
                         let parts = line.split(/[\t\s]+/);
                         if (parts.length >= 2) {
                             formatted.push(`${parts[0]}：${parts.slice(1).join(' ')}`);
@@ -719,16 +926,13 @@
                     continue;
                 }
 
-                // タブ区切りまたはスペース区切りを検出（横並びパターン）
                 let parts = [];
                 if (line.includes('\t')) {
                     parts = line.split('\t').filter(p => p.trim());
                 } else if (line.match(/\s{2,}/)) {
-                    // 複数スペースで分割
                     parts = line.split(/\s{2,}/).filter(p => p.trim());
                 }
 
-                // 横並びパターン（項目名と値が同じ行にある）
                 if (parts.length >= 2) {
                     const key = parts[0].trim();
                     const value = parts.slice(1).join(' ').trim();
@@ -738,16 +942,12 @@
                     continue;
                 }
 
-                // 縦並びパターンの判定
-                // 次の行があるかチェック
                 const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : null;
                 
-                // 現在の行が項目名らしい（日本語で終わる、記号がない）
                 const looksLikeKey = !line.match(/[0-9%]+$/) && 
                                       !line.match(/^https?:\/\//) && 
                                       !line.match(/該当なし|区域内|区域外|完了/);
 
-                // 次の行が値らしい（数字、記号、URL、短い文字列）
                 const nextLooksLikeValue = nextLine && 
                                            (nextLine.match(/^[0-9]+/) || 
                                             nextLine.match(/[%mh]/) || 
@@ -755,14 +955,12 @@
                                             nextLine.match(/該当なし|区域内|区域外|完了/) ||
                                             nextLine.length < 30);
 
-                // 縦並びパターンと判定
                 if (looksLikeKey && nextLooksLikeValue && !previousWasKey) {
                     currentKey = line;
                     previousWasKey = true;
                     continue;
                 }
 
-                // 前の行が項目名で、この行が値の場合
                 if (currentKey) {
                     formatted.push(`${currentKey}：${line}`);
                     currentKey = null;
@@ -770,19 +968,16 @@
                     continue;
                 }
 
-                // どのパターンにも当てはまらない場合はそのまま追加
                 formatted.push(line);
                 previousWasKey = false;
             }
 
             formattedText = formatted.join('\n');
             
-            // 結果を表示
             const outputDiv = document.getElementById('formattedOutput');
             outputDiv.textContent = formattedText;
             outputDiv.style.display = 'block';
             
-            // 成功メッセージを一時的に非表示
             document.getElementById('copySuccess').style.display = 'none';
         }
 
@@ -792,12 +987,10 @@
                 return;
             }
 
-            // クリップボードにコピー
             navigator.clipboard.writeText(formattedText).then(() => {
                 const successDiv = document.getElementById('copySuccess');
                 successDiv.style.display = 'block';
                 
-                // 3秒後に非表示
                 setTimeout(() => {
                     successDiv.style.display = 'none';
                 }, 3000);
