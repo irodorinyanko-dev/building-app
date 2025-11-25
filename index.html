@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建築法規調査システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Yu Gothic', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', 'Yu Gothic', 'Meiryo', sans-serif;
+        }
+
+        .input-group textarea {
+            min-height: 300px;
+            resize: vertical;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .coordinate-display {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .coordinate-display strong {
+            color: #856404;
+        }
+
+        .gis-link-section {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .gis-link-section h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .gis-info {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+
+        .alert-info {
+            background: #cfe2ff;
+            border: 1px solid #b6d4fe;
+            color: #084298;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            border: 1px solid #a3cfbb;
+            color: #0a3622;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .formatted-output {
+            background: #ffffff;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 968px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                height: 400px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ 建築法規調査システム</h1>
+            <p>地図で地点を選択 → 自治体GISサイトで情報取得 → テキスト整形</p>
+        </div>
+
+        <div class="main-content">
+            <!-- ステップ1: 住所検索 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step-badge">1</span>
+                    住所検索・地図表示
+                </div>
+                
+                <div class="input-group">
+                    <label>📍 調査対象の住所を入力</label>
+                    <input type="text" id="addressInput" placeholder="例: 東京都千代田区丸の内1-1-1">
+                </div>
+                
+                <button class="btn btn-primary" onclick="searchAddress()">
+                    🔍 住所検索
+                </button>
+
+                <div class="alert-info" style="margin-top: 15px;">
+                    💡 地図が表示されたら、調査したい地点をクリックしてください
+                </div>
+            </div>
+
+            <!-- ステップ2: 地図 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step-badge">2</span>
+                    地図上で地点を選択
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <!-- ステップ3: 座標情報とGISリンク -->
+            <div id="coordinateInfo" class="coordinate-display" style="display: none;">
+                <strong>📌 選択地点の情報:</strong><br>
+                緯度: <span id="latDisplay">-</span><br>
+                経度: <span id="lngDisplay">-</span><br>
+                自治体: <span id="municipalityDisplay" style="font-size: 18px; font-weight: bold; color: #d9534f;">-</span>
+            </div>
+
+            <div id="gisLinkSection" class="gis-link-section" style="display: none;">
+                <h3>🗺️ 自治体の都市計画情報サイト</h3>
+                <div class="gis-info">
+                    <strong id="gisCity">-</strong> の都市計画情報を確認できます
+                </div>
+                <button class="btn btn-success" onclick="openGISLink()">
+                    📂 <span id="gisCityName">自治体</span>GISサイトを開く
+                </button>
+                <div class="alert-info" style="margin-top: 15px;">
+                    ✨ GISサイトで用途地域・容積率などを確認し、情報をコピーして下の欄に貼り付けてください
+                </div>
+            </div>
+
+            <!-- ステップ4: GIS情報整形 -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="step-badge">3</span>
+                    GIS情報の整形
+                </div>
+                
+                <div class="input-group">
+                    <label>📋 GISサイトからコピーした情報を貼り付け</label>
+                    <textarea id="gisRawInput" placeholder="例:&#10;【A】用途地域等&#10;都市計画区域	都市計画区域内&#10;区域区分	市街化区域&#10;用途地域	商業地域&#10;容積率	700 %&#10;..."></textarea>
+                </div>
+                
+                <button class="btn btn-info" onclick="formatGISInfo()">
+                    ✨ テキストを整形する
+                </button>
+                <button class="btn btn-primary" onclick="copyFormatted()">
+                    📄 整形結果をコピー
+                </button>
+
+                <div class="alert-info">
+                    💡 コピーした情報を「項目名：値」形式に自動整形します
+                </div>
+
+                <div id="formattedOutput" class="formatted-output" style="display: none;"></div>
+                <div id="copySuccess" class="alert-success" style="display: none;">
+                    ✅ コピーしました！
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let marker;
+        let currentLat = null;
+        let currentLng = null;
+        let currentMunicipality = null;
+        let formattedText = '';
+
+        // 全自治体のGISサイトURL（削除厳禁）
+        const gisDatabase = {
+            '千代田区': {
+                url: 'https://tokei-gis1.chiyodatoshikei.jp/toshikei/apps/experiencebuilder/experience/?id=63107f3af4d64dfbaca424799059a7bd',
+                name: '千代田区都市計画情報サービス'
+            },
+            '中央区': {
+                url: 'https://chuo-map.jp/top.php',
+                name: '中央区地図情報サービス'
+            },
+            '港区': {
+                url: 'https://www.sonicweb-asp.jp/minato/',
+                name: '港区都市計画情報サービス'
+            },
+            '新宿区': {
+                url: 'https://www.sonicweb-asp.jp/shinjuku2/',
+                name: '新宿区都市計画情報サービス'
+            },
+            '文京区': {
+                url: 'https://www.sonicweb-asp.jp/bunkyo-youto/',
+                name: '文京区都市計画情報提供サービス'
+            },
+            '台東区': {
+                url: 'https://www2.wagmap.jp/taito/PositionSelect?mid=2',
+                name: '台東区都市計画情報提供サービス'
+            },
+            '墨田区': {
+                url: 'https://www.sonicweb-asp.jp/sumida/',
+                name: '墨田区まちづくりマップ'
+            },
+            '江東区': {
+                url: 'https://koto.geocloud.jp/',
+                name: '江東区ことまっぷ'
+            },
+            '品川区': {
+                url: 'https://www2.wagmap.jp/shinagawa/Map',
+                name: '品川区しながわMAP'
+            },
+            '目黒区': {
+                url: 'https://www.sonicweb-asp.jp/meguro/',
+                name: '目黒区めぐろ地図情報サービス'
+            },
+            '大田区': {
+                url: 'https://www2.wagmap.jp/ota/Portal',
+                name: '大田区まちマップおおた'
+            },
+            '世田谷区': {
+                url: 'https://www.sonicweb-asp.jp/setagaya/',
+                name: '世田谷区せたがやiMap'
+            },
+            '渋谷区': {
+                url: 'https://www2.wagmap.jp/shibuya/PositionSelect?mid=1000',
+                name: '渋谷区地図情報システム'
+            },
+            '中野区': {
+                url: 'https://www2.wagmap.jp/nakanodatamap/PositionSelect?mid=62',
+                name: '中野区なかのデータマップ'
+            },
+            '杉並区': {
+                url: 'https://www2.wagmap.jp/suginami/PositionSelect?mid=2',
+                name: '杉並区すぎナビ'
+            },
+            '豊島区': {
+                url: 'https://www2.wagmap.jp/toshima/PositionSelect?mid=2',
+                name: '豊島区地図情報システム'
+            },
+            '北区': {
+                url: 'https://www2.wagmap.jp/kitaku-sp/MapPage?dtp=2',
+                name: '北区地図情報システム'
+            },
+            '荒川区': {
+                url: 'https://www2.wagmap.jp/arakawa/Portal',
+                name: '荒川区地図情報'
+            },
+            '板橋区': {
+                url: 'https://itabashi.geocloud.jp/webgis/',
+                name: '板橋区都市計画情報マップ'
+            },
+            '練馬区': {
+                url: 'https://www.sonicweb-asp.jp/nerimap/',
+                name: '練馬区地図情報ねりまっぷ'
+            },
+            '足立区': {
+                url: 'https://www.sonicweb-asp.jp/adachi2/',
+                name: '足立区あだち地図情報提供サービス'
+            },
+            '葛飾区': {
+                url: 'https://www.sonicweb-asp.jp/katsushika/',
+                name: '葛飾区かつしか電子まっぷ'
+            },
+            '江戸川区': {
+                url: 'https://www2.wagmap.jp/edogawa/Portal',
+                name: '江戸川区都市計画・指定道路情報提供サービス'
+            },
+            // その他主要都市
+            '川崎市': {
+                url: 'https://kawasaki.geocloud.jp/webgis/',
+                name: '川崎市都市計画情報システム'
+            },
+            '横浜市': {
+                url: 'https://wwwm.city.yokohama.lg.jp/yokohama/Portal',
+                name: '横浜市行政地図情報提供システム'
+            },
+            '大阪市': {
+                url: 'https://www.city.osaka.lg.jp/toshikeikaku/page/0000370574.html',
+                name: '大阪市都市計画情報提供システム'
+            },
+            '名古屋市': {
+                url: 'http://www.tokei.city.nagoya.jp/map/',
+                name: '名古屋市都市計画情報提供システム'
+            },
+            '福岡市': {
+                url: 'https://webmap.city.fukuoka.lg.jp/fukuoka/',
+                name: '福岡市Webまっぷ'
+            },
+            '札幌市': {
+                url: 'https://www.city.sapporo.jp/keikaku/keikaku/gis/gis.html',
+                name: '札幌市都市計画情報提供サービス'
+            },
+            '京都市': {
+                url: 'https://www2.wagmap.jp/kyoto/Portal',
+                name: '京都市都市計画情報等検索システム'
+            },
+            '神戸市': {
+                url: 'https://www2.wagmap.jp/kobe/Portal',
+                name: '神戸市都市計画情報マップ'
+            },
+            '千葉市': {
+                url: 'https://www.city.chiba.jp/toshi/toshi/keikaku/gis.html',
+                name: '千葉市都市計画情報システム'
+            },
+            // 神奈川県主要都市
+            '相模原市': {
+                url: 'https://sagamihara.geocloud.jp/webgis/?p=1',
+                name: 'さがみはら地図情報'
+            },
+            '藤沢市': {
+                url: 'https://webgis.alandis.jp/fujisawa14/210/portal/',
+                name: 'ふじさわキュンマップ'
+            },
+            '横須賀市': {
+                url: 'https://www2.wagmap.jp/yokosuka/Portal',
+                name: 'よこすかわが街ガイド'
+            },
+            '茅ヶ崎市': {
+                url: 'https://www2.wagmap.jp/chigasaki/Portal',
+                name: 'まっぷdeちがさき'
+            },
+            '平塚市': {
+                url: 'https://webgis.alandis.jp/hiratsuka14/',
+                name: 'ひらつかわくわくマップ'
+            },
+            '大和市': {
+                url: 'https://www.machi-info.jp/machikado/yamato_city/consentpage/gis-toshi.html',
+                name: '大和市都市計画マップ'
+            },
+            // 埼玉県主要都市
+            'さいたま市': {
+                url: 'https://www.sonicweb-asp.jp/saitama/',
+                name: 'さいたま市地図情報'
+            },
+            '川口市': {
+                url: 'https://kawaguchi.geocloud.jp/webgis/?bt=0&p=1',
+                name: 'かわぐち案内マップ'
+            },
+            '川越市': {
+                url: 'http://www2.wagmap.jp/kawagoe-sp/index.asp',
+                name: '小江戸川越マップ'
+            },
+            '所沢市': {
+                url: 'https://webgis.alandis.jp/tokorozawa11/alandis/webgis/',
+                name: '所沢市地理情報システム'
+            },
+            // 千葉県主要都市
+            '船橋市': {
+                url: 'https://webgis.alandis.jp/funabashi12/portal/',
+                name: '船橋IKIIKIふれあいマップ'
+            },
+            '柏市': {
+                url: 'https://www.sonicweb-asp.jp/kashiwa/',
+                name: '柏市公開型GIS'
+            },
+            '松戸市': {
+                url: 'https://www.sonicweb-asp.jp/matsudo/',
+                name: 'やさシティマップ'
+            },
+            '市川市': {
+                url: 'https://gis.city.ichikawa.lg.jp/webgis/?bt=0&p=1',
+                name: 'いち案内'
+            }
+        };
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 35.6812, lng: 139.7671 },
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+
+            map.addListener('click', function(event) {
+                placeMarker(event.latLng);
+            });
+        }
+
+        function placeMarker(location) {
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                animation: google.maps.Animation.DROP
+            });
+
+            currentLat = location.lat();
+            currentLng = location.lng();
+
+            document.getElementById('latDisplay').textContent = currentLat.toFixed(6);
+            document.getElementById('lngDisplay').textContent = currentLng.toFixed(6);
+            document.getElementById('coordinateInfo').style.display = 'block';
+
+            reverseGeocode(currentLat, currentLng);
+        }
+
+        function searchAddress() {
+            const address = document.getElementById('addressInput').value;
+            
+            if (!address) {
+                alert('住所を入力してください');
+                return;
+            }
+
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: address }, function(results, status) {
+                if (status === 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    map.setZoom(17);
+                    placeMarker(results[0].geometry.location);
+                } else {
+                    alert('住所が見つかりませんでした: ' + status);
+                }
+            });
+        }
+
+        function reverseGeocode(lat, lng) {
+            const geocoder = new google.maps.Geocoder();
+            const latlng = { lat: lat, lng: lng };
+
+            geocoder.geocode({ location: latlng }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    let municipality = null;
+
+                    for (const component of results[0].address_components) {
+                        if (component.types.includes('locality') && component.types.includes('political')) {
+                            municipality = component.long_name;
+                            break;
+                        }
+                        if (component.types.includes('ward') && component.types.includes('political')) {
+                            municipality = component.long_name;
+                            break;
+                        }
+                    }
+
+                    if (municipality) {
+                        currentMunicipality = municipality;
+                        document.getElementById('municipalityDisplay').textContent = municipality;
+
+                        if (gisDatabase[municipality]) {
+                            document.getElementById('gisCity').textContent = municipality;
+                            document.getElementById('gisCityName').textContent = municipality;
+                            document.getElementById('gisLinkSection').style.display = 'block';
+                        } else {
+                            document.getElementById('gisLinkSection').style.display = 'none';
+                            alert('⚠️ ' + municipality + 'のGISサイト情報は登録されていません');
+                        }
+                    }
+                }
+            });
+        }
+
+        function openGISLink() {
+            if (currentMunicipality && gisDatabase[currentMunicipality]) {
+                const gisUrl = gisDatabase[currentMunicipality].url;
+                window.open(gisUrl, '_blank');
+            } else {
+                alert('自治体GISサイトの情報が見つかりません');
+            }
+        }
+
+        function formatGISInfo() {
+            const rawText = document.getElementById('gisRawInput').value;
+            
+            if (!rawText.trim()) {
+                alert('GIS情報を入力してください');
+                return;
+            }
+
+            // テキストを行単位で処理
+            const lines = rawText.split('\n');
+            let formatted = [];
+            let currentKey = null;
+            let previousWasKey = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                
+                // 空行はスキップ（セクション間の区切りとして1つ追加）
+                if (!line) {
+                    if (formatted.length > 0 && formatted[formatted.length - 1] !== '') {
+                        formatted.push('');
+                    }
+                    currentKey = null;
+                    previousWasKey = false;
+                    continue;
+                }
+
+                // セクションヘッダー（【A】など）を検出
+                if (line.match(/^【[A-Z]】/)) {
+                    if (formatted.length > 0) formatted.push('');
+                    formatted.push(line);
+                    currentKey = null;
+                    previousWasKey = false;
+                    continue;
+                }
+
+                // 「※」「説明」「URL」で始まる特殊行はそのまま
+                if (line.startsWith('※') || line.startsWith('説明') || line.startsWith('URL')) {
+                    if (line.includes('\t') || line.match(/^(説明|URL)\s/)) {
+                        // タブやスペースがある場合は分割
+                        let parts = line.split(/[\t\s]+/);
+                        if (parts.length >= 2) {
+                            formatted.push(`${parts[0]}：${parts.slice(1).join(' ')}`);
+                        } else {
+                            formatted.push('  ' + line);
+                        }
+                    } else {
+                        formatted.push('  ' + line);
+                    }
+                    currentKey = null;
+                    previousWasKey = false;
+                    continue;
+                }
+
+                // タブ区切りまたはスペース区切りを検出（横並びパターン）
+                let parts = [];
+                if (line.includes('\t')) {
+                    parts = line.split('\t').filter(p => p.trim());
+                } else if (line.match(/\s{2,}/)) {
+                    // 複数スペースで分割
+                    parts = line.split(/\s{2,}/).filter(p => p.trim());
+                }
+
+                // 横並びパターン（項目名と値が同じ行にある）
+                if (parts.length >= 2) {
+                    const key = parts[0].trim();
+                    const value = parts.slice(1).join(' ').trim();
+                    formatted.push(`${key}：${value}`);
+                    currentKey = null;
+                    previousWasKey = false;
+                    continue;
+                }
+
+                // 縦並びパターンの判定
+                // 次の行があるかチェック
+                const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : null;
+                
+                // 現在の行が項目名らしい（日本語で終わる、記号がない）
+                const looksLikeKey = !line.match(/[0-9%]+$/) && 
+                                      !line.match(/^https?:\/\//) && 
+                                      !line.match(/該当なし|区域内|区域外|完了/);
+
+                // 次の行が値らしい（数字、記号、URL、短い文字列）
+                const nextLooksLikeValue = nextLine && 
+                                           (nextLine.match(/^[0-9]+/) || 
+                                            nextLine.match(/[%mh]/) || 
+                                            nextLine.match(/^https?:\/\//) ||
+                                            nextLine.match(/該当なし|区域内|区域外|完了/) ||
+                                            nextLine.length < 30);
+
+                // 縦並びパターンと判定
+                if (looksLikeKey && nextLooksLikeValue && !previousWasKey) {
+                    currentKey = line;
+                    previousWasKey = true;
+                    continue;
+                }
+
+                // 前の行が項目名で、この行が値の場合
+                if (currentKey) {
+                    formatted.push(`${currentKey}：${line}`);
+                    currentKey = null;
+                    previousWasKey = false;
+                    continue;
+                }
+
+                // どのパターンにも当てはまらない場合はそのまま追加
+                formatted.push(line);
+                previousWasKey = false;
+            }
+
+            formattedText = formatted.join('\n');
+            
+            // 結果を表示
+            const outputDiv = document.getElementById('formattedOutput');
+            outputDiv.textContent = formattedText;
+            outputDiv.style.display = 'block';
+            
+            // 成功メッセージを一時的に非表示
+            document.getElementById('copySuccess').style.display = 'none';
+        }
+
+        function copyFormatted() {
+            if (!formattedText) {
+                alert('まず「テキストを整形する」ボタンをクリックしてください');
+                return;
+            }
+
+            // クリップボードにコピー
+            navigator.clipboard.writeText(formattedText).then(() => {
+                const successDiv = document.getElementById('copySuccess');
+                successDiv.style.display = 'block';
+                
+                // 3秒後に非表示
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 3000);
+            }).catch(err => {
+                alert('コピーに失敗しました: ' + err);
+            });
+        }
+    </script>
+
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHSxrJMfGFM3i1fFnvLOIHNT53xXVSPQI&callback=initMap&libraries=places&v=weekly">
+    </script>
+</body>
+</html>
